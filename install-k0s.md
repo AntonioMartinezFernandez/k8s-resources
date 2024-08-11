@@ -16,9 +16,10 @@ sudo k0s start
 k0s token create --role=worker
 ```
 
-## Workers
+## Configure Workers
 
-Create the file **/etc/k0s/token** and paste the previously created token
+1. Create the file **/etc/k0s/token** and paste the previously created token
+2. Install k0s
 
 ```bash
 curl -sSLf https://get.k0s.sh | sudo sh
