@@ -23,7 +23,7 @@ sudo k0s token create --role=worker
 ## Configure Workers
 
 0. Configure a static IP in the server
-1. Create the file **/etc/k0s/token** and paste the previously created token
+1. Create the file `/etc/k0s/token` and paste the previously created token
 2. Install k0s
 
 ```bash
