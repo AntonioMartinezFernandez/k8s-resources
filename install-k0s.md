@@ -2,10 +2,14 @@
 
 ## Install and start Control Plane (Master)
 
+0. Configure a static IP in the server
+1. Install
+
 ```bash
+sudo apt install curl
 curl -sSLf https://get.k0s.sh | sudo sh
-mkdir -p /etc/k0s
-k0s config create > /etc/k0s/k0s.yaml
+sudo mkdir -p /etc/k0s
+sudo k0s config create > /etc/k0s/k0s.yaml
 sudo k0s install controller -c /etc/k0s/k0s.yaml
 sudo k0s start
 ```
@@ -13,15 +17,17 @@ sudo k0s start
 ## Create token (in Control Plane)
 
 ```bash
-k0s token create --role=worker
+sudo k0s token create --role=worker
 ```
 
 ## Configure Workers
 
+0. Configure a static IP in the server
 1. Create the file **/etc/k0s/token** and paste the previously created token
 2. Install k0s
 
 ```bash
+sudo apt install curl
 curl -sSLf https://get.k0s.sh | sudo sh
 sudo k0s install worker --token-file /etc/k0s/token
 sudo k0s start
@@ -39,6 +45,12 @@ sudo k0s status
 
 ```bash
 sudo cat /var/lib/k0s/pki/admin.conf
+```
+
+**Reset k0s state node (control plane or worker)**
+
+```bash
+sudo k0s reset
 ```
 
 **Extensions**
