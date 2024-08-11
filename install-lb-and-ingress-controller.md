@@ -53,9 +53,10 @@ curl <EXTERNAL-IP>
 
 ```bash
 kubectl apply -f simple-web-server-with-nginx-ingress.yaml
-kubectl get pods
-kubectl get services # Check the external IP address of the example-http-service
-curl 192.168.1.180 -H 'Host: simple-web-example.local.com'
+kubectl get pods -n example-web # Get pods with example-web namespace
+kubectl get services -n example-web # Get services with example-web namespace
+kubectl get services -n ingress-nginx # Check the EXTERNAL-IP address of the ingress-nginx-controller
+curl <EXTERNAL-IP> -H 'Host: simple-web-example.local.com'
 ```
 
 ## Remove the example service
