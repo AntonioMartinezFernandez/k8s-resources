@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: example-web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-server
+  namespace: example-web
+spec:
+  selector:
+    matchLabels:
+      app: example-web
+  template:
+    metadata:
+      labels:
+        app: example-web
+    spec:
+      containers:
+        - name: httpd
+          image: httpd:2.4.53-alpine
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-server-service
+  namespace: example-web
+spec:
+  selector:
+    app: example-web
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-server-ingress
+  namespace: example-web
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: simple-web-example.local.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-server-service
+                port:
+                  number: 8080

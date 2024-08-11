@@ -1,0 +1,11 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: my-ip-address-pool
+  namespace: metallb-system
+spec:
+spec:
+  addresses:
+    # - 192.168.1.180-192.168.1.190 # Range of IP addresses
+    - 192.168.1.180/32 # Fixed IP address
+  autoAssign: true

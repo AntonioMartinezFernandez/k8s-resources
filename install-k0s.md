@@ -2,7 +2,7 @@
 
 ## Install and start Control Plane (Master)
 
-0. Configure a static IP in the server
+0. Configure a static IP in the server (this server could be a VM, VPS, AWS EC2 instance... with a debian based distro installed -i.e. ubuntu server-)
 1. Install
 
 ```bash
