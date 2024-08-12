@@ -39,7 +39,7 @@ kubectl get pods -n ingress-nginx
 kubectl get services -n ingress-nginx
 kubectl -n ingress-nginx get ingressclasses
 kubectl -n ingress-nginx annotate ingressclasses nginx ingressclass.kubernetes.io/is-default-class="true" # Only if there is an only instance of the ingress nginx controller
-kubectl edit service ingress-nginx-controller -n ingress-nginx # Or go to Lens, Menu Network > Services > ingress-nginx-controller > edit ...
+kubectl edit service ingress-nginx-controller -n ingress-nginx # Or go to OpenLens, Menu Network > Services > ingress-nginx-controller > edit ...
 # Change all "NodePort" to "LoadBalancer"
 kubectl get services -n ingress-nginx # Check that the TYPE is LoadBalancer
 curl <EXTERNAL-IP>
