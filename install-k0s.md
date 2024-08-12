@@ -2,13 +2,14 @@
 
 ## Install and start Control Plane (Master)
 
-0. Configure a static IP in the server (this server could be a VM, VPS, AWS EC2 instance... with a debian based distro installed -i.e. ubuntu server-)
+0. [Configure static IP in the server (in case the server is a VM -i.e. ubuntu server-)](https://www.linuxtechi.com/static-ip-address-on-ubuntu-server/)
 1. Install
 
 ```bash
 sudo apt install curl
 curl -sSLf https://get.k0s.sh | sudo sh
 sudo mkdir -p /etc/k0s
+sudo su
 sudo k0s config create > /etc/k0s/k0s.yaml
 sudo k0s install controller -c /etc/k0s/k0s.yaml
 sudo k0s start

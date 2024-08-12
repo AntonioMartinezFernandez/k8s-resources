@@ -20,11 +20,11 @@ kubectl apply -f l2-advertisement.yaml
 ## Verify Load Balancer
 
 ```bash
-kubectl apply -f example-load-balancer.yaml
+kubectl apply -f load-balancer.yaml
 # Check that is an available EXTERNAL-IP
-kubectl get service example-load-balancer
-# Remove example load balancer
-kubectl delete -f example-load-balancer.yaml
+kubectl get service load-balancer
+# Remove load balancer
+kubectl delete -f load-balancer.yaml
 ```
 
 ## Install NGINX ingress controller
