@@ -2,6 +2,7 @@
 
 Kubernetes resources
 
+- [**Installing k8s cluster with Raspberry Pi's**](./raspi-cluster.md)
 - [Install k0s](./install-k0s.md)
 - [Install kubectl](./install-kubectl.md)
 - [Install OpenLens](./install-openlens.md)

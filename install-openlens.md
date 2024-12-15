@@ -4,6 +4,7 @@
 
 1. Go to `https://github.com/MuhammedKalkan/OpenLens/releases` and download the installation package
 2. Install
+3. Add the [shell](https://medium.com/geekculture/fix-essential-functionality-missing-in-the-new-openlens-version-f9ac862e9e27) plugin
 
 ## Add Cluster
 
