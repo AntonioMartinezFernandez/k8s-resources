@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lb-checker
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lb-checker-deployment
+  namespace: lb-checker
+  labels:
+    app: lb-checker-web
+spec:
+  selector:
+    matchLabels:
+      app: lb-checker-web
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: lb-checker-web
+    spec:
+      containers:
+      - name: lb-checker-web
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lb-checker-service
+  namespace: lb-checker
+spec:
+  type: LoadBalancer
+  selector:
+    app: lb-checker-web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
