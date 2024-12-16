@@ -76,15 +76,14 @@ brew install kubectl
 
 ```bash
 export KUBECONFIG="$HOME/.kube/config"
-alias k="kubectl"
-alias kraspi="kubectl --kubeconfig $HOME/.kube/raspi-config"
+alias k="kubectl --kubeconfig $HOME/.kube/raspi-config"
 ```
 
 4. `source ~/.zshrc`
 5. Check the cluster info
 
 ```bash
-kraspi cluster-info
+k cluster-info
 ```
 
 6. Config the access to the Raspberry Pi's cluster with [OpenLens](./install-openlens.md)
@@ -98,27 +97,27 @@ brew install helm
 
 ```bash
 # Check latest MetalLB version. In this case is v0.14.8 (backup in the 00-metal-lb-install.yaml file)
-kraspi apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.8/config/manifests/metallb-native.yaml
+k apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.8/config/manifests/metallb-native.yaml
 
-kraspi get pods -n metallb-system
+k get pods -n metallb-system
 ```
 
 9. Create MetalLB IP addresses pool and layer 2 advertisement
 
 ```bash
-kraspi apply -f 01-ip-address-pool.yaml
+k apply -f 01-ip-address-pool.yaml
 ```
 
 10. Check the MetalLB IP addresses pool
 
 ```bash
-kraspi apply -f 02-load-balancer-checker.yaml
+k apply -f 02-load-balancer-checker.yaml
 
-kraspi get services -n lb-checker -o wide # Check that the EXTERNAL-IP is available
+k get services -n lb-checker -o wide # Check that the EXTERNAL-IP is available
 
 curl -X GET http://<EXTERNAL-IP>/
 
-kraspi delete -f 02-load-balancer-checker.yaml
+k delete -f 02-load-balancer-checker.yaml
 ```
 
 11. Install the Ingress Controller
@@ -128,7 +127,7 @@ kraspi delete -f 02-load-balancer-checker.yaml
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.3/deploy/static/provider/cloud/deploy.yaml
 
 # Check the ingress-nginx-controller have an external IP address
-kraspi -n ingress-nginx get svc ingress-nginx-controller
+k -n ingress-nginx get svc ingress-nginx-controller
 ```
 
 ## How to install an example application
@@ -136,19 +135,19 @@ kraspi -n ingress-nginx get svc ingress-nginx-controller
 1. Apply the resources
 
 ```bash
-kraspi apply -f 03-namespace.yaml # Create the application namespace
+k apply -f 03-namespace.yaml # Create the application namespace
 
-kraspi apply -f 04-deployment.yaml # Create the deployment with 2 replicas of the application
+k apply -f 04-deployment.yaml # Create the deployment with 2 replicas of the application
 
-kraspi apply -f 05-service.yaml # Create the ClusterIP service with port 8080 pointing to the port 80 of the application
+k apply -f 05-service.yaml # Create the ClusterIP service with port 8080 pointing to the port 80 of the application
 
-kraspi apply -f 06-ingress.yaml # Create the ingress with the host green-app.local (path "/") pointing to the service
+k apply -f 06-ingress.yaml # Create the ingress with the host green-app.local (path "/") pointing to the service
 ```
 
 2. Check the application IP address
 
 ```bash
-kraspi get ingress green-ingress -n green-web-app -o wide
+k get ingress green-ingress -n green-web-app -o wide
 ```
 
 3. Access the application
@@ -177,28 +176,28 @@ helm install \
   --set installCRDs=true
 
 # From a normal terminal, to check the cert-manager pods are running
-kraspi -n cert-manager get pods
+k -n cert-manager get pods
 ```
 
 4. Create the LetsEncrypt Issuer. This step is only needed once in the cluster. If you already have a LetsEncrypt issuer created, you can skip this step
 
 ```bash
-kraspi apply -f 00-letsencrypt-issuer.yaml
+k apply -f 00-letsencrypt-issuer.yaml
 ```
 
 5. Deploy the example application
 
 ```bash
-kraspi apply -f 01-namespace.yaml
-kraspi apply -f 02-deployment.yaml
-kraspi apply -f 03-service.yaml
-kraspi apply -f 04-ingress.yaml # <<<<< NOT EXECUTED - Fix the issue with the certificate request before run this command
+k apply -f 01-namespace.yaml
+k apply -f 02-deployment.yaml
+k apply -f 03-service.yaml
+k apply -f 04-ingress.yaml
 ```
 
 6. Check the certificate status
 
 ```bash
-kraspi get certificates -n amf-cluster-namespace
+k get certificates -n amf-cluster-namespace
 ```
 
 7. Access the application
