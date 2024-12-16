@@ -15,7 +15,7 @@ sudo nano /etc/dhcpcd.conf
 interface eth0
 static ip_address=192.168.1.113/24
 static routers=192.168.1.1
-static domain_name_servers=1.1.1.1
+static domain_name_servers=192.168.1.115 # Custom DNS server (pi-hole)
 ```
 
 3. Disable SWAP
@@ -99,6 +99,7 @@ brew install helm
 ```bash
 # Check latest MetalLB version. In this case is v0.14.8 (backup in the 00-metal-lb-install.yaml file)
 kraspi apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.8/config/manifests/metallb-native.yaml
+
 kraspi get pods -n metallb-system
 ```
 
@@ -112,8 +113,11 @@ kraspi apply -f 01-ip-address-pool.yaml
 
 ```bash
 kraspi apply -f 02-load-balancer-checker.yaml
+
 kraspi get services -n lb-checker -o wide # Check that the EXTERNAL-IP is available
+
 curl -X GET http://<EXTERNAL-IP>/
+
 kraspi delete -f 02-load-balancer-checker.yaml
 ```
 
@@ -133,8 +137,11 @@ kraspi -n ingress-nginx get svc ingress-nginx-controller
 
 ```bash
 kraspi apply -f 03-namespace.yaml # Create the application namespace
+
 kraspi apply -f 04-deployment.yaml # Create the deployment with 2 replicas of the application
+
 kraspi apply -f 05-service.yaml # Create the ClusterIP service with port 8080 pointing to the port 80 of the application
+
 kraspi apply -f 06-ingress.yaml # Create the ingress with the host green-app.local (path "/") pointing to the service
 ```
 
@@ -148,4 +155,58 @@ kraspi get ingress green-ingress -n green-web-app -o wide
 
 ```bash
 curl -H 'Host: green-app.local' http://<EXTERNAL-IP>/
+```
+
+## Deploy an example application with TLS
+
+0. Point the public domain to the MetalLB IP in the custom DNS server (Pi-Hole) (e.g. `amf-cluster.duckdns.org` to `192.168.1.200`)
+1. Configure a public domain (e.g. `amf-cluster.duckdns.org`) with a DNS provider (e.g. duckdns.org) and point it to your router public IP address
+2. Configure your router to forward the ports 80 and 443 to the MetalLB IP address (IP address defined in the `01-ip-addresses.yaml` file)
+3. Install cert-manager
+
+```bash
+helm repo add jetstack https://charts.jetstack.io
+
+helm repo update
+
+# From a terminal in OpenLens (to install the cert-manager in the raspi cluster)
+helm install \
+ cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --set installCRDs=true
+
+# From a normal terminal, to check the cert-manager pods are running
+kraspi -n cert-manager get pods
+```
+
+4. Create the LetsEncrypt Issuer. This step is only needed once in the cluster. If you already have a LetsEncrypt issuer created, you can skip this step
+
+```bash
+kraspi apply -f 00-letsencrypt-issuer.yaml
+```
+
+5. Deploy the example application
+
+```bash
+kraspi apply -f 01-namespace.yaml
+kraspi apply -f 02-deployment.yaml
+kraspi apply -f 03-service.yaml
+kraspi apply -f 04-ingress.yaml # <<<<< NOT EXECUTED - Fix the issue with the certificate request before run this command
+```
+
+6. Check the certificate status
+
+```bash
+kraspi get certificates -n amf-cluster-namespace
+```
+
+7. Access the application
+
+```bash
+# From local network
+curl -H 'Host: amf-cluster.duckdns.org' https://192.168.1.200/
+
+# From internet
+curl -X GET https://amf-cluster.duckdns.org/
 ```

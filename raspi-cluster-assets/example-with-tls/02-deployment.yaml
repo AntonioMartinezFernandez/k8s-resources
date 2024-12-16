@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amf-cluster-deployment
+  namespace: amf-cluster-namespace
+  labels:
+    app: amf-cluster-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: amf-cluster-app
+  template:
+    metadata:
+      labels:
+        app: amf-cluster-app
+    spec:
+      containers:
+      - name: amf-cluster-app
+        image: hashicorp/http-echo:1.0.0
+        args:
+        - "-text=Hello world from AMF k8s cluster!"
+        ports:
+        - containerPort: 5678
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
