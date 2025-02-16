@@ -30,7 +30,7 @@ https://kubernetes.io/docs/, https://kubernetes.io/blog/ . This includes all ava
 
 -o yaml --- Output a YAML formatted API object.
 
-# --dry-run --- By default, as soon as the command is run, the resource will be created. If you simply want to test your command, use the --dry-run=client option. This will not create the resource. Instead, tell you whether the resource can be created and if your command is right.
+--dry-run=client --- By default, as soon as the command is run, the resource will be created. If you simply want to test your command, use the --dry-run=client option. This will not create the resource. Instead, tell you whether the resource can be created and if your command is right.
 ```
 
 ### Internal DNS
