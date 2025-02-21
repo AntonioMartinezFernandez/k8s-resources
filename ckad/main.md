@@ -50,3 +50,35 @@ https://kubernetes.io/docs/, https://kubernetes.io/blog/ . This includes all ava
 # Example:
 db-service.prod.svc.cluster.local
 ```
+
+### Dockerfile vs K8s Pod
+
+**Dockerfile**
+
+```yml
+FROM ubuntu
+
+ENTRYPOINT["sleep"]
+CMD["5"]
+```
+
+**Pod**
+
+*commands* will replace the ENTRYPOINT values of the Dockerfile
+
+*args* will replace the CMD values of the Dockerfile
+
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu-sleeper-pod
+spec:
+  containers:
+  - name: ubuntu-sleeper
+    image: ubuntu-sleeper
+    command: ["sleep2"]
+    args: ["10"]
+    ports:
+    - containerPort: 80
+```

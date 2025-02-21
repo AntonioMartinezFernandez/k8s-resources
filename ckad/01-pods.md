@@ -7,11 +7,14 @@ metadata:
   name: nginx
 spec:
   containers:
-  - name: nginx
-    image: nginx:1.14.2
-    args: []
-    ports:
-    - containerPort: 80
+    - name: nginx
+      image: nginx:1.14.2
+      args: []
+      ports:
+        - containerPort: 80
+      env:
+        - name: foo
+          value: bar
 ```
 
 ```bash

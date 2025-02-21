@@ -206,3 +206,33 @@ spec:
   restartPolicy: Always
 status: {}
 ```
+
+## CKAD Practice #6 (ConfigMaps)
+
+```bash
+k get pods webapp -o yaml > pod.yaml
+
+k create configmap \
+  webapp-config --from-literal=APP_COLOR=blue \
+               --from-literal=APP_FIZZ=buzz
+```
+
+```yml
+# Pod using ConfigMap
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+    - name: webapp
+      image: webapp
+      ports:
+        - containerPort: 8080
+      env:
+        - name: APP_COLOR
+          valueFrom:
+            configMapKeyRef:
+              name: webapp-config
+              key: APP_COLOR
+```
