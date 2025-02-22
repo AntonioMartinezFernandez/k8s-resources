@@ -236,3 +236,13 @@ spec:
               name: webapp-config
               key: APP_COLOR
 ```
+
+## CKAD Practice #7 (Secrets)
+
+```bash
+k describe secrets secret-name
+k get secrets secret-name -o yaml
+echo -n 'text_to_encode' | base64
+k create secret generic \
+  secret-name --from-literal=KEY=value
+```

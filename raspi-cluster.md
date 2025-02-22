@@ -222,3 +222,22 @@ k -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}
 k port-forward -n argocd service/argocd-server 8080:80
 # Access https://localhost:8080 with admin/copied-password credentials
 ```
+
+## Access to etcd DDBB
+
+```bash
+sudo apt install etcd-client
+
+sudo ETCDCTL_ENDPOINTS='https://127.0.0.1:2379' \
+ETCDCTL_CACERT='/var/lib/rancher/k3s/server/tls/etcd/server-ca.crt' \
+ETCDCTL_CERT='/var/lib/rancher/k3s/server/tls/etcd/server-client.crt' \
+ETCDCTL_KEY='/var/lib/rancher/k3s/server/tls/etcd/server-client.key' \
+ETCDCTL_API=3 etcdctl endpoint health
+
+# Get secret from etcd
+sudo ETCDCTL_ENDPOINTS='https://127.0.0.1:2379' \
+ETCDCTL_CACERT='/var/lib/rancher/k3s/server/tls/etcd/server-ca.crt' \
+ETCDCTL_CERT='/var/lib/rancher/k3s/server/tls/etcd/server-client.crt' \
+ETCDCTL_KEY='/var/lib/rancher/k3s/server/tls/etcd/server-client.key' \
+ETCDCTL_API=3 etcdctl get /registry/secrets/default/<secret-name> | hexdump -C
+```

@@ -64,9 +64,9 @@ CMD["5"]
 
 **Pod**
 
-*commands* will replace the ENTRYPOINT values of the Dockerfile
+_commands_ will replace the ENTRYPOINT values of the Dockerfile
 
-*args* will replace the CMD values of the Dockerfile
+_args_ will replace the CMD values of the Dockerfile
 
 ```yml
 apiVersion: v1
@@ -75,10 +75,20 @@ metadata:
   name: ubuntu-sleeper-pod
 spec:
   containers:
-  - name: ubuntu-sleeper
-    image: ubuntu-sleeper
-    command: ["sleep2"]
-    args: ["10"]
-    ports:
-    - containerPort: 80
+    - name: ubuntu-sleeper
+      image: ubuntu-sleeper
+      command: ['sleep2']
+      args: ['10']
+      ports:
+        - containerPort: 80
+```
+
+## Encode/Decode base64 from terminal
+
+```bash
+# Encode
+echo -n 'text_to_encode' | base64
+
+# Decode
+echo -n 'dGV4dF90b19lbmNvZGU=' | base64 -d
 ```
