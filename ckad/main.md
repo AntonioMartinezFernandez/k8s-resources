@@ -8,6 +8,11 @@
 - [Replicasets](./02-replicasets.md)
 - [Deployments](03-deployments.md)
 - [Namespaces](./04-namespaces.md)
+- [ConfigMaps](./05-configmaps.md)
+- [Secrets](./06-secrets.md)
+- [Security Contexts](./07-security-contexts.md)
+- [Service Accounts](./08-service-accounts.md)
+- [Resource Requirements](./09-resource-requirements.md)
 
 ## Exam Resources
 
