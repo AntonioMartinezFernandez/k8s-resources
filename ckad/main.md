@@ -92,3 +92,7 @@ echo -n 'text_to_encode' | base64
 # Decode
 echo -n 'dGV4dF90b19lbmNvZGU=' | base64 -d
 ```
+
+## Encryption at rest for etcd data
+
+- [Encrypt secrets data at rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/)

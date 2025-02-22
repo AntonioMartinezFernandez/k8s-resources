@@ -246,3 +246,28 @@ echo -n 'text_to_encode' | base64
 k create secret generic \
   secret-name --from-literal=KEY=value
 ```
+
+## CKAD Practice #8 (Security Contexts)
+
+```bash
+k describe pods <pod-name>
+k exec -it <pod-name> -- sh
+ps aux
+```
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu-sleeper
+  namespace: default
+spec:
+  containers:
+    - command:
+        - sleep
+        - '4800'
+      image: ubuntu
+      name: ubuntu
+      securityContext:
+        runAsUser: 1010
+```
