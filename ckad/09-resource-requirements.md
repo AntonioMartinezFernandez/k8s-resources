@@ -1,0 +1,5 @@
+## Resource requirements
+
+```bash
+
+```

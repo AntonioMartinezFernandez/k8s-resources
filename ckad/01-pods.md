@@ -35,6 +35,8 @@ curl localhost:5678
 k run httpd --image=httpd:alpine --port=80 --expose=true
 
 # open a shell into a pod
+k exec -it <pod-name> -- sh
+k exec -it -n <namespace> -c <pod-name> -- sh -c "clear; (bash || ash || sh)"
 k exec --stdin --tty <pod-name> -- /bin/sh
 
 # delete pod

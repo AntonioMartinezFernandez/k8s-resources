@@ -271,3 +271,87 @@ spec:
       securityContext:
         runAsUser: 1010
 ```
+
+## CKAD Practice #9 (Service Accounts)
+
+```bash
+k get serviceaccount
+
+k create serviceaccount <serviceaccount-name>
+
+k create token <serviceaccount-name>
+
+k get deployment <deployment-name> -o yaml > deployment.yaml
+
+k delete deployment <deployment-name>
+
+k create -f deployment.yaml
+
+k exec -it <pod-name> -- sh
+
+cat /var/run/secrets/kubernetes.io/serviceaccount/token
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-echo
+  namespace: http-echo
+spec:
+  template:
+    metadata:
+      labels:
+        app: http-echo
+    spec:
+      containers:
+        - image: antoniomarfer/http-echo
+          imagePullPolicy: Always
+          name: http-echo
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          serviceAccountName: my-custom-service-account
+          automountServiceAccountToken: false
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+```
+
+## CKAD Practice #10 (Resource requirements)
+
+```bash
+
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: http-echo
+  namespace: http-echo
+spec:
+  template:
+    metadata:
+      labels:
+        app: http-echo
+    spec:
+      containers:
+        - image: antoniomarfer/http-echo
+          imagePullPolicy: Always
+          name: http-echo
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+```
