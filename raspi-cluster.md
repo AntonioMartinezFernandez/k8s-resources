@@ -209,3 +209,16 @@ curl -H 'Host: amf-cluster.duckdns.org' https://192.168.1.200/
 # From internet
 curl -X GET https://amf-cluster.duckdns.org/
 ```
+
+## Install ArgoCD
+
+```bash
+k create namespace argocd
+k apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/latest/manifests/install.yaml
+k get pods -n argocd
+k get svc -n argocd
+k -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+# Copy the password
+k port-forward -n argocd service/argocd-server 8080:80
+# Access https://localhost:8080 with admin/copied-password credentials
+```
