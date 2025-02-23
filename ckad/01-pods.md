@@ -44,4 +44,7 @@ k delete pod echo
 
 # force pod deletion
 k delete pod <pod-name> --force
+
+# watch the pods state (auto-refreshing data)
+k get pods -w 
 ```

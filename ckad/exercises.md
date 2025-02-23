@@ -1,6 +1,6 @@
 ## CKAD Practice #1 (PODS)
 
-```
+```bash
 alias k=kubectl
 k get pods
 k run nginx --image nginx
@@ -40,7 +40,7 @@ k get all -o wide
 
 ## CKAD Practice #2 (REPLICASETS)
 
-```
+```bash
 alias k=kubectl
 
 k get pods
@@ -65,7 +65,7 @@ k scale replicaset --replicas=5 <replicaset-name>
 
 ## CKAD Practice #3 (DEPLOYMENTS)
 
-```
+```bash
 k describe deployments frontend-deployment
 k create deployment --help
 k create deployment <deployment-name> --image=<docker-image> --replicas=<number-of-replicas> --port=<port-exposed>
@@ -73,7 +73,7 @@ k create deployment <deployment-name> --image=<docker-image> --replicas=<number-
 
 ## CKAD Practice #4 (NAMESPACES)
 
-```
+```bash
 k get namespaces
 k get pods -n <namespace-name>
 k get pods --all-namespaces
@@ -82,7 +82,9 @@ k run redis --image=redis --namespace=finance
 
 ## CKAD Practice #5 (IMPERATIVE MANAGEMENT)
 
-```pod.yaml
+```yaml
+# pod.yaml
+
 # k run redis --image=redis:alpine --dry-run=client -o yaml > redis.yaml
 # (and add the tier=db label)
 
@@ -96,15 +98,17 @@ metadata:
   name: redis
 spec:
   containers:
-  - image: redis:alpine
-    name: redis
-    resources: {}
+    - image: redis:alpine
+      name: redis
+      resources: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Always
 status: {}
 ```
 
-```service.yaml
+```yaml
+# service.yaml
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -118,7 +122,9 @@ spec:
       targetPort: 6379
 ```
 
-```deployment.yaml
+```yaml
+# deployment.yaml
+
 # k create deployment webapp --image=kodekloud/webapp-color --replicas=3 --dry-run=client -o yaml > webapp-deployment.yaml
 
 apiVersion: apps/v1
@@ -141,13 +147,15 @@ spec:
         app: webapp
     spec:
       containers:
-      - image: kodekloud/webapp-color
-        name: webapp-color
-        resources: {}
+        - image: kodekloud/webapp-color
+          name: webapp-color
+          resources: {}
 status: {}
 ```
 
-```custom-nginx.yaml
+```yaml
+# custom-nginx.yaml
+
 # k run custom-nginx --image=nginx --port=8080 -o yaml --dry-run=client > custom-nginx.yaml
 
 apiVersion: v1
@@ -159,17 +167,19 @@ metadata:
   name: custom-nginx
 spec:
   containers:
-  - image: nginx
-    name: custom-nginx
-    ports:
-    - containerPort: 8080
-    resources: {}
+    - image: nginx
+      name: custom-nginx
+      ports:
+        - containerPort: 8080
+      resources: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Always
 status: {}
 ```
 
-```custom-webapp.yaml
+```yaml
+# custom-webapp.yaml
+
 # k run httpd --image=httpd:alpine --port=80 --expose=true
 
 apiVersion: v1
@@ -179,14 +189,15 @@ metadata:
   name: httpd
 spec:
   ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 80
+    - port: 80
+      protocol: TCP
+      targetPort: 80
   selector:
     run: httpd
 status:
   loadBalancer: {}
 ---
+
 ---
 apiVersion: v1
 kind: Pod
@@ -197,11 +208,11 @@ metadata:
   name: httpd
 spec:
   containers:
-  - image: httpd:alpine
-    name: httpd
-    ports:
-    - containerPort: 80
-    resources: {}
+    - image: httpd:alpine
+      name: httpd
+      ports:
+        - containerPort: 80
+      resources: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Always
 status: {}
@@ -312,7 +323,6 @@ spec:
             - containerPort: 8080
               protocol: TCP
           serviceAccountName: my-custom-service-account
-          automountServiceAccountToken: false
         resources:
           limits:
             cpu: 100m
@@ -325,7 +335,10 @@ spec:
 ## CKAD Practice #10 (Resource requirements)
 
 ```bash
-
+k describe pod <pod-name>
+k delete pod <pod-name>
+k get pod <pod-name> -o yaml > deployment.yml
+k create -f deployment.yml
 ```
 
 ```yaml
@@ -354,4 +367,126 @@ spec:
             requests:
               cpu: 100m
               memory: 128Mi
+```
+
+## CKAD Practice #11 (Taints and tolerations)
+
+```bash
+k get nodes
+
+k describe nodes node01 | grep 'Taint'
+
+kubectl taint nodes node01 spray=mortein:NoSchedule
+
+k get pods -w
+
+k describe nodes controlplane | grep 'Taint'
+
+k taint node controlplane node-role.kubernetes.io/control-plane:NoSchedule-
+```
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bee
+  labels:
+    env: test
+spec:
+  containers:
+    - name: bee
+      image: nginx
+  tolerations:
+    - key: 'spray'
+      operator: 'Equal'
+      value: 'mortein'
+      effect: 'NoSchedule'
+```
+
+## CKAD Practice #12 (Node Selectors and Affinity)
+
+```bash
+k describe nodes node01
+
+k label nodes node01 color=blue
+
+k create deployment blue --image=nginx --replicas=3 --dry-run=client -o yaml > blue-deployment.yaml
+
+k create -f blue-deployment.yaml
+
+k delete deployment blue
+
+k get pods -o wide
+
+
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: blue
+  name: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blue
+  template:
+    metadata:
+      labels:
+        app: blue
+    spec:
+      containers:
+        - image: nginx
+          name: nginx
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: color
+                    operator: In
+                    values:
+                      - blue
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: red
+  name: red
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: red
+  template:
+    metadata:
+      labels:
+        app: red
+    spec:
+      containers:
+        - image: nginx
+          name: nginx
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: Exists
+```
+
+## CKAD Practice #13
+
+```bash
+
+```
+
+```yaml
+
 ```

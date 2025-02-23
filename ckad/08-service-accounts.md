@@ -25,3 +25,17 @@ spec:
       image: my-service:1.0.0
   serviceAccountName: serviceaccount-name
 ```
+
+To avoid automount service account:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-service
+spec:
+  containers:
+    - name: my-service
+      image: my-service:1.0.0
+  automountServiceAccountToken: false
+```
