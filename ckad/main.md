@@ -13,6 +13,8 @@
 - [Security Contexts](./07-security-contexts.md)
 - [Service Accounts](./08-service-accounts.md)
 - [Resource Requirements](./09-resource-requirements.md)
+- [Taints and Tolerations](./10-taints-and-tolerations.md)
+- [Node Selectors and Affinity](./11-node-selectors-and-affinity.md)
 
 ## Exam Resources
 

@@ -481,12 +481,67 @@ spec:
                     operator: Exists
 ```
 
-## CKAD Practice #13
+## CKAD Practice #13 (Multicontainers)
 
 ```bash
+k get pods yellow -o wide
 
+k get all -n elastic-stack
+
+k logs -n elastic-stack kibana
+
+k exec -it -n elastic-stack app -- cat /log/app.log
+
+k create -f elastic-app.yaml
 ```
 
 ```yaml
+# sidecar
 
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    name: app
+  name: app
+  namespace: elastic-stack
+spec:
+  volumes:
+    - name: log-volume
+      emptyDir: {}
+  containers:
+    - image: kodekloud/event-simulator
+      name: app
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+        - mountPath: /log
+          name: log-volume
+    - image: kodekloud/filebeat-configured
+      name: sidecar
+      volumeMounts:
+        - mountPath: /var/log/event-simulator/
+          name: log-volume
 ```
+
+```yaml
+# initContainers
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+spec:
+  containers:
+    - name: myapp-container
+      image: busybox:1.28
+      command: ['sh', '-c', 'echo The app is running! && sleep 3600']
+  initContainers:
+    - name: init-myservice
+      image: busybox
+      command: ['sh', '-c', 'git clone <some-repository-that-will-be-used-by-application> ;']
+```
+
+## CKAD Practice #14 (Observability)
