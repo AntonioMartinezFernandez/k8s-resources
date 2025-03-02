@@ -225,6 +225,8 @@ k port-forward -n argocd service/argocd-server 8080:80
 
 ## Access to etcd DDBB
 
+[[Docs] etcd encryption at rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/)
+
 ```bash
 sudo apt install etcd-client
 
