@@ -624,3 +624,83 @@ spec:
               image: kodekloud/throw-dice
           restartPolicy: OnFailure
 ```
+
+## CKAD Practice #17 (Service and Ingress)
+
+```bash
+k create ns ingress-nginx
+k -n ingress-nginx create configmap ingress-nginx-controller
+k -n ingress-nginx create serviceaccount ingress-nginx
+k -n ingress-nginx create serviceaccount ingress-nginx-admission
+
+k -n app-space edit ingress <ingress-name>
+```
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pay-ingress
+  namespace: critical-space
+  annotations:
+    # Docs: https://kubernetes.github.io/ingress-nginx/examples/rewrite/
+    nginx.ingress.kubernetes.io/rewrite-target: / # It redirect the 'path' used in the rules to the root path ('/') of the service
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /pay
+            pathType: Prefix
+            backend:
+              service:
+                name: pay-service
+                port:
+                  number: 8282
+```
+
+## CKAD Practice #18 (Network Policies)
+
+```bash
+k get networkpolicies --all-namespaces
+k delete networkpolicies <policy-name>
+```
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: internal-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      name: internal
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              name: external
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              name: external
+      ports:
+        - protocol: TCP
+          port: 8080
+    - to:
+        - podSelector:
+            matchLabels:
+              name: database
+      ports:
+        - protocol: TCP
+          port: 3306
+```
+
+## CKAD Practice #19 (Volumes)
