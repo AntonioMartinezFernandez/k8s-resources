@@ -545,3 +545,82 @@ spec:
 ```
 
 ## CKAD Practice #14 (Observability)
+
+```bash
+k logs -f pods/<pod-name>
+k top node
+k -n <namespace> top pod
+```
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bee
+  labels:
+    env: test
+spec:
+  containers:
+    - name: bee
+      image: nginx
+      readinessProbe:
+        httpGet:
+          path: /api/ready
+          port: 80
+      livenessProbe:
+        httpGet:
+          path: /api/live
+          port: 80
+```
+
+## CKAD Practice #15 (POD design)
+
+```bash
+k describe deployments frontend
+k edit deployments frontend # to change the number of replicas on-the-fly
+```
+
+## CKAD Practice #16 (Jobs and Cronjobs)
+
+```bash
+k create -f job.yaml
+k delete job throw-dice-job
+
+k create -f cronjob.yaml
+```
+
+```yaml
+# job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: throw-dice-job
+spec:
+  completions: 3
+  parallelism: 3
+  backoffLimit: 100
+  template:
+    spec:
+      containers:
+        - name: throw-dice
+          image: kodekloud/throw-dice
+      restartPolicy: Never
+```
+
+```yaml
+# cronjob.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: throw-dice-cron-job
+spec:
+  schedule: '30 21 * * *'
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: throw-dice
+              image: kodekloud/throw-dice
+          restartPolicy: OnFailure
+```

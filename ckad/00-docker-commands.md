@@ -22,4 +22,7 @@ docker run -p <host-port>:<container-port> <app-name>
 
 # List running containers
 docker ps
+
+# Show container logs
+docker logs -f <container-name>
 ```

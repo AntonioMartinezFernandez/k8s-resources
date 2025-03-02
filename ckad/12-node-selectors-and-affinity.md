@@ -1,5 +1,10 @@
 ## Node selectors & Affinity
 
+We can set labels to the cluster NODEs, and then:
+
+- Set POD 'nodeSelector': this POD will be deployed only in NODEs where the nodeSelector match with the NODE label
+- Set POD 'affinity' rules: this POD will be deployed following the defined rules
+
 ```bash
 # Label a node
 k label nodes <node-name> <label-key>=<label-value>
@@ -38,10 +43,10 @@ spec:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution: # requiredDuringSchedulingIgnoredDuringExecution|preferredDuringSchedulingIgnoredDuringExecution|requiredDuringSchedulingRequiredDuringExecution
         nodeSelectorTerms:
-        - matchExpressions:
-          - key: size
-            operator: In # In|NotIn|Exists
-            values:
-            - Large
-            - Medium
+          - matchExpressions:
+              - key: size
+                operator: In # In|NotIn|Exists
+                values:
+                  - Large
+                  - Medium
 ```

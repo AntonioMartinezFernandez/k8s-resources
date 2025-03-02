@@ -1,6 +1,7 @@
 ## Pods
 
 ```yml
+# Common POD
 apiVersion: v1
 kind: Pod
 metadata:
@@ -9,6 +10,7 @@ spec:
   containers:
     - name: nginx
       image: nginx:1.14.2
+      restartPolicy: Always
       args: []
       ports:
         - containerPort: 80
@@ -46,5 +48,9 @@ k delete pod echo
 k delete pod <pod-name> --force
 
 # watch the pods state (auto-refreshing data)
-k get pods -w 
+k get pods -w
+
+# using selector for pod labels
+k get pods --selector tag=value
+k get pods -l tag1=value1,tag2=value2,tag3=value3
 ```
