@@ -704,3 +704,90 @@ spec:
 ```
 
 ## CKAD Practice #19 (Volumes)
+
+```bash
+k exec webapp -- cat /log/app.log
+
+k delete pvc claim-log-1 # Recreate it with correct access mode
+```
+
+```yaml
+# Pod with volume
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+    - name: webapp
+      image: kodekloud/event-simulator
+      volumeMounts:
+        - mountPath: /log
+          name: mylogs
+  volumes:
+    - name: mylogs
+      hostPath:
+        path: /var/log/webapp
+        type: DirectoryOrCreate
+```
+
+```yaml
+# PV
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-log
+spec:
+  capacity:
+    storage: 100Mi
+  storageClassName: manual
+  persistentVolumeReclaimPolicy: Retain
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: '/pv/log'
+```
+
+```yaml
+# PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: claim-log-1
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+```
+
+```yaml
+# Pod with PVC attached
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+    - name: webapp
+      image: kodekloud/event-simulator
+      volumeMounts:
+        - mountPath: /log
+          name: mylogs
+  volumes:
+    - name: mylogs
+      persistentVolumeClaim:
+        claimName: claim-log-1
+```
+
+## CKAD Practice #20 (Kubeconfig)
+
+```bash
+
+```
+
+```yaml
+
+```

@@ -43,6 +43,9 @@ k exec -it <pod-name> -- sh
 k exec -it -n <namespace> -c <pod-name> -- sh -c "clear; (bash || ash || sh)"
 k exec --stdin --tty <pod-name> -- /bin/sh
 
+# see content file into a pod
+k exec <pod-name> -- cat <filepath>
+
 # delete pod
 k delete pod echo
 
