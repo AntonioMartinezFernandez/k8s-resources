@@ -119,3 +119,9 @@ echo -n 'dGV4dF90b19lbmNvZGU=' | base64 -d
 # pipe to "wc -l" return the number of lines
 k get clusterroles.rbac.authorization.k8s.io --all-namespaces | wc -l
 ```
+
+## Get installed OS
+
+```bash
+cat /etc/os-release # Discover operating system installed
+```
