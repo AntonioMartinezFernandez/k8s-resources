@@ -785,9 +785,172 @@ spec:
 ## CKAD Practice #20 (Kubeconfig)
 
 ```bash
+k config view
+k config set-context develop --kubeconfig=/root/my-kube-config
+
+vi .bashrc
+# include line:
+# export KUBECONFIG=/root/my-kube-config
+source ~/.bashrc
+```
+
+## CKAD Practice #21 (RBAC)
+
+```bash
+cat /etc/kubernetes/manifests/kube-apiserver.yaml
+k get roles --all-namespaces
+k -n kube-system describe role kube-proxy
+k edit roles dev-user
+
+k get clusterroles.rbac.authorization.k8s.io --all-namespaces | wc -l
+
+k describe clusterrolebindings.rbac.authorization.k8s.io cluster-admin
+
 
 ```
 
 ```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: blue
+  name: developer
+rules:
+  - apiGroups: [''] # "" indicates the core API group
+    resources: ['pods']
+    verbs: ['get', 'create', 'update', 'delete', 'watch']
+  - apiGroups: ['apps'] # "" indicates the core API group
+    resources: ['deployments']
+    verbs: ['create']
+```
 
+## CKAD Practice #22 (Admission Controllers)
+
+```bash
+k exec -n kube-system kube-apiserver-controlplane -- kube-apiserver -h
+
+cat /etc/kubernetes/manifests/kube-apiserver.yaml
+vi /etc/kubernetes/manifests/kube-apiserver.yaml
+# adding line: - --enable-admission-plugins=NamespaceAutoProvision
+# adding line: - --disable-admission-plugins=DefaultStorageClass
+
+k run --image=nginx nginx -n blue # blue namespace auto-created
+# NOTE that NamespaceAutoProvision is deprecated!!!
+# Now is used NamespaceLifecycle and namespace auto-creation is not supported (and default namespaces can't be deleted)
+
+ps -ef | grep kube-apiserver | grep admission-plugins # check the processes to see enabled and disabled plugins
+```
+
+## CKAD Practice #23 (Validating and Mutating Admission Controllers)
+
+```bash
+kubectl create secret tls tls-secret --cert=path/to/tls.crt --key=path/to/tls.key -n webhook-demo
+k get secrets -n webhook-demo
+
+
+k edit pods pod-with-defaults # for checking security context
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-server
+  namespace: webhook-demo
+  labels:
+    app: webhook-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook-server
+  template:
+    metadata:
+      labels:
+        app: webhook-server
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1234
+      containers:
+        - name: server
+          image: stackrox/admission-controller-webhook-demo:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8443
+              name: webhook-api
+          volumeMounts:
+            - name: webhook-tls-certs
+              mountPath: /run/secrets/tls
+              readOnly: true
+      volumes:
+        - name: webhook-tls-certs
+          secret:
+            secretName: webhook-server-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-server
+  namespace: webhook-demo
+spec:
+  selector:
+    app: webhook-server
+  ports:
+    - port: 443
+      targetPort: webhook-api
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: demo-webhook
+webhooks:
+  - name: webhook-server.webhook-demo.svc
+    clientConfig:
+      service:
+        name: webhook-server
+        namespace: webhook-demo
+        path: '/mutate'
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURQekNDQWllZ0F3SUJBZ0lVZUo4VFJUK0JOMFE3MUppMi9NVmV4dnFUUkdnd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0x6RXRNQ3NHQTFVRUF3d2tRV1J0YVhOemFXOXVJRU52Ym5SeWIyeHNaWElnVjJWaWFHOXZheUJFWlcxdgpJRU5CTUI0WERUSTFNRE14TmpFeU16VXhObG9YRFRJMU1EUXhOVEV5TXpVeE5sb3dMekV0TUNzR0ExVUVBd3drClFXUnRhWE56YVc5dUlFTnZiblJ5YjJ4c1pYSWdWMlZpYUc5dmF5QkVaVzF2SUVOQk1JSUJJakFOQmdrcWhraUcKOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQW1BV2FZL25MN2gyWXp2YTBrcG5Gcmd4Si9leVpIYm9ZQnVwRApiWkhpTk9IbmN6QytIQzV1M0ErRzFEUnVTM2hjSzhYdy9xNnQ1a01xdU5Ld3dmVFE5SXlMdWppSnhsL2pvQ0xuClJUckRyK2hOSGdwaDQrZHYxb0FNa3hRQ2ZlLzhOb2wxZjhBb1RBUmo2RzN2cmlrSnczTzlvUFJva3g0dVVzNWgKeGQwNVhwdnRIZ0o5MDhlaEdVdGJXS2dqY0dyVFJrM2tRYWw1RGUzVEVrNkNHM3dUY1p1Y2tsSGhEa1ZYbHVpWQp1Q0dVMENQblpFM3AvVTJDNWpxS09aTnJGUnEra2VoanMzQ25CazRod1MrQkZoWHgvdnJDdldqTEFJRnBURDNICkZZY1dDNGtPZDFYVU1WamhRbEtOQnQzcnkrNXBobXVIMFpjUWZwWStyZTZYVkI1YnZRSURBUUFCbzFNd1VUQWQKQmdOVkhRNEVGZ1FVOFBiQnZxeXNweERnOU1keHpNU3NWUkI3TG1Zd0h3WURWUjBqQkJnd0ZvQVU4UGJCdnF5cwpweERnOU1keHpNU3NWUkI3TG1Zd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBTkJna3Foa2lHOXcwQkFRc0ZBQU9DCkFRRUFnckJrMGhSZHhKTms2STAyaUE3cFlwbEllZUFlNW9pYm0wZlJFQXpINkpjblR0TFlTOGYwVDlTSW92NEEKTXdreDRTNTFvT3pDQ1hPSzRUMHMwaDR5SU8rdi9tUlF6UitYYThjdlAydjJsZzFIamZmTnAyd3dUY2E3VW1GQgpoWnMzdU8zUzBkTUpTZGhKK0hTMUhGUHRpNFVzRTBGenNranNPQ1dPSG11aXBISlNvN1hSUTNIQjVReXAyMkgxCnQvWXVGMXdxRkJFM2crbjFCWXprUlc2NjVKbUdLUWlCRklTcW01cnAxWC8vTHJGSTk5Ym8wcXZENk5yY2UzZ1oKMEd3dzR1NVFTZmJUdlJwRlJYaCtBVk04S1BZYURQR2M0Z0k4YUwvbmFTKzYxU2I1NkF2VURYQ1BWWjJlR3FTWApvWkprcVJYbkNlVldBNTNMTjVKSmx5NGE4dz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    rules:
+      - operations: ['CREATE']
+        apiGroups: ['']
+        apiVersions: ['v1']
+        resources: ['pods']
+    admissionReviewVersions: ['v1beta1']
+    sideEffects: None
+---
+```
+
+## CKAD Practice #24 (API Versions / Deprecations)
+
+```bash
+k api-resources
+
+k proxy
+curl localhost:8001/apis/rbac.authorization.k8s.io
+
+vi /etc/kubernetes/manifests/kube-apiserver.yaml # Add "- --runtime-config=rbac.authorization.k8s.io/v1alpha1
+
+# Install kubectl convert: https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-kubectl-convert-plugin
+
+k convert -f ingress-old.yaml -o yaml > new.yaml
+k create -f new.yaml
+```
+
+## CKAD Practice #25 (Helm)
+
+```bash
+cat /etc/os-release # Discover operating system installed
+
+# Install Helm
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+
+# Get environment variables
+helm env
+
+# Get helm client version
+helm version
 ```

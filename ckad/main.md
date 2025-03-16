@@ -112,3 +112,10 @@ echo -n 'dGV4dF90b19lbmNvZGU=' | base64 -d
 ## Encryption at rest for etcd data
 
 - [Encrypt secrets data at rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/)
+
+## Count output lines
+
+```bash
+# pipe to "wc -l" return the number of lines
+k get clusterroles.rbac.authorization.k8s.io --all-namespaces | wc -l
+```

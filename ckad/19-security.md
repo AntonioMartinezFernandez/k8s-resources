@@ -1,9 +1,0 @@
-## Security Primitives
-
-```bash
-
-```
-
-```yaml
-
-```
