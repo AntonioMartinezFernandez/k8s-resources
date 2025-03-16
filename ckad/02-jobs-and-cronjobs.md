@@ -61,4 +61,10 @@ k create -f <job-definition-file>
 k get pods
 k logs <pod-name>
 k delete job <job-name>
+
+k run nginx --image=busybox:1.28 --restart=Always  # (pod)
+k run nginx --image=busybox:1.28 --restart=Never  # (job)
+k run nginx --image=busybox:1.28 --restart=OnFailure  # (job)
+k run nginx --image=busybox:1.28 --restart=Never --schedule="* * * * *" # (cronJob)
+k run nginx --image=busybox:1.28 --restart=OnFailure --schedule="* * * * *" # (cronJob)
 ```

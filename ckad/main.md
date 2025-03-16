@@ -21,13 +21,21 @@
 - [Services](./15-services.md)
 - [Ingress](./16-ingress.md)
 - [Network Policies](./17-network-policies.md)
+- [Volumes](./18-volumes.md)
+- [Security - Authentication Kubeconfig](./19-security-authentication-kubeconfig.md)
+- [Security - RBAC](./20-security-RBAC.md)
+- [Security - Admission Controllers](./21-security-admission-controllers.md)
+- [Security - API Versions / Deprecations](./22-security-api-versions-deprecations.md)
+- [CRs & CRDs](./23-custom-resources-and-crds.md)
+- [Helm](./24-helm.md)
 
 ## Exam Resources
 
+- https://kubernetes.io/docs/reference/kubectl/quick-reference/
+- https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
+
 - https://www.linkedin.com/pulse/my-ckad-exam-experience-atharva-chauthaiwale/
 - https://medium.com/@harioverhere/ckad-certified-kubernetes-application-developer-my-journey-3afb0901014
-
-- https://kubernetes.io/docs/reference/kubectl/quick-reference/
 
 During the exam, candidates may:
 
@@ -44,6 +52,18 @@ https://kubernetes.io/docs/, https://kubernetes.io/blog/ . This includes all ava
 
 - use the search function provided on https://kubernetes.io/docs/ however, they may only open search results that have a domain matching the sites listed above
 
+### Resources shortcuts
+
+- **po**: pods
+- **rs**: replica sets
+- **deploy**: deployments
+- **svc**: services
+- **ns**: namespaces
+- **netpol**: network policies
+- **pv**: persistent volumes
+- **pvc**: persistent volume claims
+- **sa**: service accounts
+
 ### Output Formats and useful options
 
 ```
@@ -56,6 +76,12 @@ https://kubernetes.io/docs/, https://kubernetes.io/blog/ . This includes all ava
 -o yaml --- Output a YAML formatted API object.
 
 --dry-run=client --- By default, as soon as the command is run, the resource will be created. If you simply want to test your command, use the --dry-run=client option. This will not create the resource. Instead, tell you whether the resource can be created and if your command is right.
+```
+
+Example:
+
+```bash
+k run service-name --image=nginx --dry-run=client -o yaml > pod.yaml # Create the definition of a new pod in yaml format and save it in the file pod.yaml
 ```
 
 ### Internal DNS
@@ -113,15 +139,16 @@ echo -n 'dGV4dF90b19lbmNvZGU=' | base64 -d
 
 - [Encrypt secrets data at rest](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/)
 
-## Count output lines
+## Useful commands
 
 ```bash
+# Explain a k8s resource
+k explain <resource> --recursive # Complete description of the k8s object, going recursively into all the fields
+
+# Count command output lines
 # pipe to "wc -l" return the number of lines
 k get clusterroles.rbac.authorization.k8s.io --all-namespaces | wc -l
-```
 
-## Get installed OS
-
-```bash
+# Get installed OS
 cat /etc/os-release # Discover operating system installed
 ```

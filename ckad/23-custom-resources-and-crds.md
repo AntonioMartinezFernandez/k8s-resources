@@ -1,9 +1,4 @@
-## Custom Resources / Custom Resource Definitions
-
-```bash
-
-
-```
+## Custom Resources / Custom Resource Definitions∫
 
 Custom Resource Definition example
 
